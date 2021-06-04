@@ -1,8 +1,9 @@
 package main
 
 import (
-	"awesomeProject/notify"
-	"awesomeProject/tailer"
+	"filetailer/config"
+	"filetailer/notify"
+	"filetailer/tailer"
 	"flag"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -19,13 +20,15 @@ func main() {
 	}
 	appConfig := getConfig(configFile)
 
+	log.Println("config:", appConfig)
+
 	fileHandler := tailer.NewFileTailer(appConfig.File.Path, appConfig.File.Pattern)
 	notifer := notify.BuildNotifer(appConfig.Notifer.Name, appConfig.Notifer.Option)
 	fileHandler.Handle(notifer)
 }
 
-func getConfig(configFile string) AppConfig {
-	var appConfig AppConfig
+func getConfig(configFile string) config.AppConfig {
+	var appConfig config.AppConfig
 	config, err := ioutil.ReadFile(configFile)
 
 	if err != nil {

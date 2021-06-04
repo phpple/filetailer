@@ -1,4 +1,4 @@
-package main
+package config
 
 type FileConfig struct {
 	Path    string `yaml:"path"`
@@ -7,10 +7,10 @@ type FileConfig struct {
 
 type NotiferConfig struct {
 	Name string `yaml:"name"`
-	Option map[string]string `yaml:"option"`
+	Option map[string]interface{} `yaml:"option"`
 }
 
 type AppConfig struct {
-	File FileConfig `yaml:"file"`
+	File    FileConfig    `yaml:"file"`
 	Notifer NotiferConfig `yaml:"notifer"`
 }

@@ -1,10 +1,11 @@
 package tailer
 
 import (
-	"awesomeProject/notify"
+	"filetailer/notify"
 	"github.com/hpcloud/tail"
 	"log"
 	"regexp"
+	"runtime"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type FileTailer struct {
 	Path   string
 	Regexp *regexp.Regexp
 	LastFoundTime time.Time
+	Poll bool
 }
 
 func NewFileTailer(path string, pattern string) *FileTailer {
@@ -20,18 +22,21 @@ func NewFileTailer(path string, pattern string) *FileTailer {
 		return nil
 	}
 	timestampRegexp := regexp.MustCompile(pattern)
+
+	log.Println("os:", runtime.GOOS)
 	return &FileTailer{
 		Path:   path,
 		Regexp: timestampRegexp,
+		Poll: runtime.GOOS == "windows",
 	}
 }
 
 func (self *FileTailer) Handle(notifer notify.Notifer) {
 	tails, err := tail.TailFile(self.Path, tail.Config{
-		ReOpen:    true,
+		ReOpen:    false,
 		Follow:    true,
 		MustExist: true,
-		Poll:      false,
+		Poll:      self.Poll,
 		Location:  &tail.SeekInfo{Offset: 0, Whence: 2},
 	})
 	if err != nil {
@@ -78,7 +83,7 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 		buffer = append(buffer, msg.Text)
 	}
 	if len(buffer) > 0 {
-		notifer.Notify(buffer)
+		go notifer.Notify(buffer)
 	}
 }
 

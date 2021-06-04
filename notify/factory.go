@@ -1,10 +1,14 @@
 package notify
 
+import "github.com/mitchellh/mapstructure"
+
 // 构建通知器
-func BuildNotifer(name string, option map[string]string) Notifer  {
+func BuildNotifer(name string, option map[string]interface{}) Notifer  {
 	switch name {
 	case "dingtalk":
-		notifer := NewDingtalkNotier(option["token"])
+		var dtOption DingtalkOption
+		mapstructure.Decode(option,&dtOption)
+		notifer := NewDingtalkNotier(dtOption)
 		return &notifer
 	default:
 		notifer := LoggerNotifer{}
