@@ -1,12 +1,12 @@
 package config
 
 type FileConfig struct {
-	Path    string `yaml:"path"`
-	Pattern string `yaml:"pattern"`
+	Paths   []string `yaml:"paths"`
+	Pattern string   `yaml:"pattern"`
 }
 
 type NotiferConfig struct {
-	Name string `yaml:"name"`
+	Name   string                 `yaml:"name"`
 	Option map[string]interface{} `yaml:"option"`
 }
 

@@ -14,6 +14,7 @@ type FileTailer struct {
 	Regexp *regexp.Regexp
 	LastFoundTime time.Time
 	Poll bool
+	buffer []string
 }
 
 func NewFileTailer(path string, pattern string) *FileTailer {
@@ -46,7 +47,7 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 
 	var msg *tail.Line
 	var ok bool
-	var buffer = make([]string, 0)
+	self.buffer = make([]string, 0)
 
 	ticker := time.NewTicker(1 * time.Second)
 	// 一定要调用Stop()，回收资源
@@ -55,10 +56,9 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 		for {
 			// 每5秒中从chan t.C 中读取一次
 			<-t.C
-			if (time.Now().Unix() - self.LastFoundTime.Unix() > 2 && len(buffer) > 0) {
+			if (time.Now().Unix() - self.LastFoundTime.Unix() > 2 && len(self.buffer) > 0) {
 				log.Println("timer send")
-				notifer.Notify(buffer)
-				buffer = make([]string, 0)
+				self.sendBuffers(notifer)
 			}
 		}
 	}(ticker)
@@ -74,17 +74,21 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 		if self.isNewLine([]byte(msg.Text)) {
 			log.Print("found new line")
 
-			if len(buffer) > 0 {
-				go notifer.Notify(buffer)
-				buffer = make([]string, 0)
-			}
+			self.sendBuffers(notifer)
 		}
 		self.LastFoundTime = time.Now()
-		buffer = append(buffer, msg.Text)
+		self.buffer = append(self.buffer, msg.Text)
 	}
-	if len(buffer) > 0 {
-		go notifer.Notify(buffer)
+	self.sendBuffers(notifer)
+}
+
+func (self *FileTailer)sendBuffers(notifer notify.Notifer)  {
+	if len(self.buffer) == 0 {
+		return
 	}
+	self.buffer = append(self.buffer, "file:" + self.Path)
+	notifer.Notify(self.buffer)
+	self.buffer = make([]string, 0)
 }
 
 func (self *FileTailer) isNewLine(line []byte) bool {

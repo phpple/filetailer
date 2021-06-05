@@ -22,9 +22,15 @@ func main() {
 
 	log.Println("config:", appConfig)
 
-	fileHandler := tailer.NewFileTailer(appConfig.File.Path, appConfig.File.Pattern)
 	notifer := notify.BuildNotifer(appConfig.Notifer.Name, appConfig.Notifer.Option)
-	fileHandler.Handle(notifer)
+
+	for _, path := range appConfig.File.Paths {
+		fileHandler := tailer.NewFileTailer(path, appConfig.File.Pattern)
+		go fileHandler.Handle(notifer)
+	}
+	// 不退出主进程
+	for {
+	}
 }
 
 func getConfig(configFile string) config.AppConfig {
@@ -38,9 +44,11 @@ func getConfig(configFile string) config.AppConfig {
 	if err != nil {
 		log.Fatalln("yaml parse failed:", err)
 	}
-	appConfig.File.Path, err = filepath.Abs(appConfig.File.Path)
-	if err != nil {
-		log.Fatalln("file path error:", err)
+	for k, path := range appConfig.File.Paths {
+		appConfig.File.Paths[k], err = filepath.Abs(path)
+		if err != nil {
+			log.Fatalln("file path error:", err)
+		}
 	}
 	return appConfig
 }
