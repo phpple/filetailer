@@ -16,7 +16,6 @@ Basic Configuration
 
 ```yaml
 file:
-#  path: "./debug.log"
   paths:
     - "./debug.log"
     - "./debug2.log"
