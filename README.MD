@@ -1,7 +1,7 @@
 FileTailer
 ==========
 
-A tool to monitor error log and send notify by dingtalk.
+A tool of monitoring error log and sending notify by dingtalk.
 
 Usage
 ------
