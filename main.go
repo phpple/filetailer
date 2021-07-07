@@ -5,20 +5,34 @@ import (
 	"filetailer/notify"
 	"filetailer/tailer"
 	"flag"
+	"fmt"
 	"gopkg.in/yaml.v3"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"strconv"
 )
 
 func main() {
+	//合建chan
+	c := make(chan os.Signal)
+	//监听所有信号
+	signal.Notify(c)
+
 	configFile := *flag.String("config", "", "config file")
 	if configFile == "" {
 		pwd, _ := os.Getwd()
 		configFile = pwd + "/config.yml"
 	}
 	appConfig := getConfig(configFile)
+
+	defer func() {
+		delPid(appConfig.Pid)
+	}()
+	writePid(appConfig.Pid)
 
 	log.Println("config:", appConfig)
 
@@ -28,9 +42,21 @@ func main() {
 		fileHandler := tailer.NewFileTailer(path, appConfig.File.Pattern)
 		go fileHandler.Handle(notifer)
 	}
-	// 不退出主进程
-	for {
-	}
+	s := <-c
+	fmt.Println("filetailer exit", s)
+	delPid(appConfig.Pid)
+}
+
+// 删除pid文件
+func delPid(pidFile string) {
+	os.Remove(pidFile)
+}
+
+// 写入pid文件
+func writePid(pidFile string) {
+	pid := os.Getpid()
+	var perm fs.FileMode = 0
+	os.WriteFile(pidFile, []byte(strconv.Itoa(pid)), perm)
 }
 
 func getConfig(configFile string) config.AppConfig {
@@ -49,6 +75,10 @@ func getConfig(configFile string) config.AppConfig {
 		if err != nil {
 			log.Fatalln("file path error:", err)
 		}
+	}
+
+	if appConfig.Pid == "" {
+		appConfig.Pid = "app.pid"
 	}
 	return appConfig
 }

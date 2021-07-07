@@ -9,6 +9,7 @@ Usage
 ```
 ./filetailer
 ```
+
 The configuration file named config.yml must place in the same directory.
 
 Basic Configuration

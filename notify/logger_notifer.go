@@ -8,6 +8,6 @@ import (
 type LoggerNotifer struct {
 }
 
-func (self *LoggerNotifer)Notify(msgs []string)  {
+func (self *LoggerNotifer) Notify(msgs []string) {
 	log.Println(strings.Join(msgs, "\n"))
 }

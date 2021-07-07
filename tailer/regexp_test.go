@@ -9,7 +9,7 @@ import "github.com/stretchr/testify/assert"
 func TestIsNewLine(t *testing.T) {
 	pwd, _ := os.Getwd()
 
-	handler := NewFileTailer(pwd + "/hello.log", "^\\d{4}\\/\\d{2}\\/\\d{2} ")
+	handler := NewFileTailer(pwd+"/hello.log", "^\\d{4}\\/\\d{2}\\/\\d{2} ")
 
 	line := []byte("2021-06-02 16:07:00,329 [http-nio-28083-exec-2] ERROR [com.legendshop.base.log.PaymentLog] PaymentLog.java:34 - pay notify , error {} ")
 	newLine := handler.isNewLine(line)

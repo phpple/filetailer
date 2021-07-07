@@ -13,4 +13,5 @@ type NotiferConfig struct {
 type AppConfig struct {
 	File    FileConfig    `yaml:"file"`
 	Notifer NotiferConfig `yaml:"notifer"`
+	Pid     string        `yaml:"pid"`
 }

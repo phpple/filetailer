@@ -10,11 +10,11 @@ import (
 )
 
 type FileTailer struct {
-	Path   string
-	Regexp *regexp.Regexp
+	Path          string
+	Regexp        *regexp.Regexp
 	LastFoundTime time.Time
-	Poll bool
-	buffer []string
+	Poll          bool
+	buffer        []string
 }
 
 func NewFileTailer(path string, pattern string) *FileTailer {
@@ -28,7 +28,7 @@ func NewFileTailer(path string, pattern string) *FileTailer {
 	return &FileTailer{
 		Path:   path,
 		Regexp: timestampRegexp,
-		Poll: runtime.GOOS == "windows",
+		Poll:   runtime.GOOS == "windows",
 	}
 }
 
@@ -56,7 +56,7 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 		for {
 			// 每5秒中从chan t.C 中读取一次
 			<-t.C
-			if (time.Now().Unix() - self.LastFoundTime.Unix() > 2 && len(self.buffer) > 0) {
+			if time.Now().Unix()-self.LastFoundTime.Unix() > 2 && len(self.buffer) > 0 {
 				log.Println("timer send")
 				self.sendBuffers(notifer)
 			}
@@ -82,11 +82,11 @@ func (self *FileTailer) Handle(notifer notify.Notifer) {
 	self.sendBuffers(notifer)
 }
 
-func (self *FileTailer)sendBuffers(notifer notify.Notifer)  {
+func (self *FileTailer) sendBuffers(notifer notify.Notifer) {
 	if len(self.buffer) == 0 {
 		return
 	}
-	self.buffer = append(self.buffer, "file:" + self.Path)
+	self.buffer = append(self.buffer, "file:"+self.Path)
 	notifer.Notify(self.buffer)
 	self.buffer = make([]string, 0)
 }
