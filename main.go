@@ -5,23 +5,17 @@ import (
 	"filetailer/notify"
 	"filetailer/tailer"
 	"flag"
-	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
 func main() {
-	//合建chan
-	c := make(chan os.Signal)
-	//监听所有信号
-	signal.Notify(c)
-
 	configFile := *flag.String("config", "", "config file")
 	if configFile == "" {
 		pwd, _ := os.Getwd()
@@ -42,9 +36,10 @@ func main() {
 		fileHandler := tailer.NewFileTailer(path, appConfig.File.Pattern)
 		go fileHandler.Handle(notifer)
 	}
-	s := <-c
-	fmt.Println("filetailer exit", s)
-	delPid(appConfig.Pid)
+
+	for {
+		time.Sleep(10 * time.Second)
+	}
 }
 
 // 删除pid文件
