@@ -1,17 +1,17 @@
 package config
 
-type FileConfig struct {
-	Paths   []string `yaml:"paths"`
-	Pattern string   `yaml:"pattern"`
-}
+import (
+    "filetailer/notifier"
+    "filetailer/watcher"
+)
 
-type NotiferConfig struct {
-	Name   string                 `yaml:"name"`
-	Option map[string]interface{} `yaml:"option"`
+type GlobalNotifierConfig struct {
+    Default string                    `yaml:"default"`
+    List    []*notifier.NotifierConfig `yaml:"list"`
 }
 
 type AppConfig struct {
-	File    FileConfig    `yaml:"file"`
-	Notifer NotiferConfig `yaml:"notifer"`
-	Pid     string        `yaml:"pid"`
+    Watchers  []*watcher.Watcher    `yaml:"watchers"`
+    Notifiers GlobalNotifierConfig `yaml:"notifiers"`
+    Pid       string                  `yaml:"pid"`
 }

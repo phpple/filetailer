@@ -3,6 +3,7 @@ module filetailer
 go 1.16
 
 require (
+	github.com/benhoyt/goawk v1.7.0
 	github.com/blinkbean/dingtalk v0.0.0-20201231030509-45a553a84503
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/hpcloud/tail v1.0.0

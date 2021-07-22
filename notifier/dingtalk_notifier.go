@@ -1,4 +1,4 @@
-package notify
+package notifier
 
 import (
     "github.com/blinkbean/dingtalk"
@@ -16,7 +16,7 @@ type DingtalkOption struct {
 
 var DefaultSendFrequece time.Duration = 2 * time.Second
 
-type DingtalkNotier struct {
+type DingtalkNotifier struct {
     Client *dingtalk.DingTalk
     Option DingtalkOption
 }
@@ -36,12 +36,10 @@ func writeMessage(msg DingtalkMessage) {
     msgQueue <- msg
 }
 
-func (self DingtalkNotier) fetchQueue() {
+func (self DingtalkNotifier) fetchQueue() {
     for {
         // 每5秒中从chan t.C 中读取一次
         if msg, ok := <-msgQueue; ok {
-            log.Println(msg.Lines)
-
             var message string
             lineLen := len(msg.Lines)
             if self.Option.MaxLine > 0 && lineLen > self.Option.MaxLine {
@@ -84,11 +82,11 @@ func (self DingtalkNotier) fetchQueue() {
     }
 }
 
-func NewDingtalkNotier(option DingtalkOption) DingtalkNotier {
+func NewDingtalkNotier(option DingtalkOption) DingtalkNotifier {
     log.Println("dingtalk created:", option)
     client := dingtalk.InitDingTalk(option.Tokens, option.Keyword)
 
-    notifer := DingtalkNotier{
+    notifer := DingtalkNotifier{
         client,
         option,
     }
@@ -96,7 +94,7 @@ func NewDingtalkNotier(option DingtalkOption) DingtalkNotier {
     return notifer
 }
 
-func (self *DingtalkNotier) Notify(msgs []string) {
+func (self *DingtalkNotifier) Notify(msgs []string) {
     writeMessage(DingtalkMessage{
         Title: "error found",
         Lines: msgs,

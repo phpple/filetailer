@@ -1,4 +1,4 @@
-package notify
+package notifier
 
 import (
 	"github.com/mitchellh/mapstructure"
@@ -6,7 +6,7 @@ import (
 )
 
 // 构建通知器
-func BuildNotifer(name string, option map[string]interface{}) Notifer {
+func BuildNotifier(name string, option map[string]interface{}) Notifier {
 	switch name {
 	case "dingtalk":
 		var dtOption DingtalkOption
@@ -15,7 +15,7 @@ func BuildNotifer(name string, option map[string]interface{}) Notifer {
 		notifer := NewDingtalkNotier(dtOption)
 		return &notifer
 	default:
-		notifer := LoggerNotifer{}
+		notifer := LoggerNotifier{}
 		return &notifer
 	}
 }
